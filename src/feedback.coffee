@@ -4,8 +4,8 @@ feedback =
   default_feedback:
     warning: ''
     suggestions: [
-      "Use a few words, avoid common phrases"
-      "No need for symbols, digits, or uppercase letters"
+      "از چند کلمه استفاده و از عبارات رایج جلوگیری کنید."
+      "نیازی به استفاده از حروف بزرگ، اعداد و علائم نیست."
     ]
 
   get_feedback: (score, sequence) ->
@@ -22,7 +22,7 @@ feedback =
     for match in sequence[1..]
       longest_match = match if match.token.length > longest_match.token.length
     feedback = @get_match_feedback(longest_match, sequence.length == 1)
-    extra_feedback = 'Add another word or two. Uncommon words are better.'
+    extra_feedback = 'یک یا دو کلمه‌ی دیگر اضافه کنید. رایج نباشند.'
     if feedback?
       feedback.suggestions.unshift extra_feedback
       feedback.warning = '' unless feedback.warning?
@@ -50,18 +50,18 @@ feedback =
 
       when 'repeat'
         warning = if match.base_token.length == 1
-          'Repeats like "aaa" are easy to guess'
+          'تکرارهایی مثل aaa به سادگی قابل حدس‌زدن هستند.'
         else
-          'Repeats like "abcabcabc" are only slightly harder to guess than "abc"'
+          'تکرارهایی مثل abcabcabc فقط کمی سخت‌تر از حدس‌زدن abc هستند.'
         warning: warning
         suggestions: [
-          'Avoid repeated words and characters'
+          'از تکرار کلمات و حروف خودداری کنید.'
         ]
 
       when 'sequence'
-        warning: "Sequences like abc or 6543 are easy to guess"
+        warning: "تکرارهایی مانند abc و 6543 به راحتی قابل حدس‌زدن هستند."
         suggestions: [
-          'Avoid sequences'
+          'از تکرار کلمات و حروف خودداری کنید.'
         ]
 
       when 'regex'
@@ -73,44 +73,44 @@ feedback =
           ]
 
       when 'date'
-        warning: "Dates are often easy to guess"
+        warning: "تاریخ‌ها معمولا به راحتی قابل حدس‌زدن هستند."
         suggestions: [
-          'Avoid dates and years that are associated with you'
+          'از تاریخ‌ها و سال‌هایی که به نوعی با شما مرتبط هستند، استفاده نکنید.'
         ]
 
   get_dictionary_match_feedback: (match, is_sole_match) ->
     warning = if match.dictionary_name == 'passwords'
       if is_sole_match and not match.l33t and not match.reversed
         if match.rank <= 10
-          'This is a top-10 common password'
+          'این رمز بین ۱۰ رمز عبور رایج دنیا است.'
         else if match.rank <= 100
-          'This is a top-100 common password'
+          'این رمز بین ۱۰۰ رمز عبور رایج دنیا است.'
         else
-          'This is a very common password'
+          'این یک رمز عبور رایج است'
       else if match.guesses_log10 <= 4
-        'This is similar to a commonly used password'
+        'این رمز، مشابه رمزهای رایج است.'
     else if match.dictionary_name == 'english_wikipedia'
       if is_sole_match
-        'A word by itself is easy to guess'
+        'یک کلمه به تنهایی، به سادگی قابل حدس‌زدن است.'
     else if match.dictionary_name in ['surnames', 'male_names', 'female_names']
       if is_sole_match
-        'Names and surnames by themselves are easy to guess'
+        'اسامی به راحتی قابل حدس‌زدن هستند.'
       else
-        'Common names and surnames are easy to guess'
+        'اسامی رایج به راحتی قابل حدس‌زدن هستند.'
     else
       ''
 
     suggestions = []
     word = match.token
     if word.match(scoring.START_UPPER)
-      suggestions.push "Capitalization doesn't help very much"
+      suggestions.push "استفاده از حروف بزرگ کمک چندانی نمی‌کند."
     else if word.match(scoring.ALL_UPPER) and word.toLowerCase() != word
-      suggestions.push "All-uppercase is almost as easy to guess as all-lowercase"
+      suggestions.push "حدس رمزهایی که کاملا با حروف بزرگ هستند تقریبا معادل رمزهایی کاملا با حروف کوچک است."
 
     if match.reversed and match.token.length >= 4
-      suggestions.push "Reversed words aren't much harder to guess"
+      suggestions.push "کلمات رزرو شده به‌راحتی قابل حدس‌زدن هستند."
     if match.l33t
-      suggestions.push "Predictable substitutions like '@' instead of 'a' don't help very much"
+      suggestions.push "حالت‌های قابل پیش‌بینی مثل استفاده از @ به جای a کمک چندانی نمی‌کند."
 
     result =
       warning: warning
